@@ -1,30 +1,33 @@
 package main
 
 import (
+	"embed"
+	_ "image/png"
 	"log"
 
+	"github.com/garinyaroslav/duel/internal"
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
-type Game struct{}
+const (
+	screenWidth  = 1280
+	screenHeight = 720
+	windowTitle  = "Duel"
+	targetTPS    = 100
+)
 
-func (g *Game) Update() error {
-	return nil
-}
-
-func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "Hello, World!")
-}
-
-func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 320, 240
-}
+//go:embed assets/*
+var AssetsFs embed.FS
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Hello, World!")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	ebiten.SetWindowSize(screenWidth, screenHeight)
+	ebiten.SetWindowTitle(windowTitle)
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetFullscreen(true)
+	ebiten.SetVsyncEnabled(true)
+	ebiten.SetTPS(targetTPS)
+
+	if err := ebiten.RunGame(internal.NewGame(AssetsFs)); err != nil {
 		log.Fatal(err)
 	}
 }
