@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func LoadImage(assetPath string, embedFs embed.FS) *ebiten.Image {
+func LoadImage(assetPath string, embedFs *embed.FS) *ebiten.Image {
 	f, err := embedFs.Open(assetPath)
 	if err != nil {
 		log.Panic(err)

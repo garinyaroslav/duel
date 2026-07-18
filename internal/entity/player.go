@@ -1,37 +1,47 @@
 package entity
 
 import (
+	"embed"
 	"time"
 
 	"github.com/garinyaroslav/duel/pkg"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type Player struct {
-	Position     pkg.Vec2
-	Velocity     pkg.Vec2
-	MaxSpeed     float64
-	Acceleration float64
-	Deceleration float64
-	Sprite       *ebiten.Image
+	Position         pkg.Vec2
+	Velocity         pkg.Vec2
+	MaxSpeed         float64
+	Acceleration     float64
+	Deceleration     float64
+	Sprite           *ebiten.Image
+	ProjectileSprite *ebiten.Image
+	ProjectileX      float64
+	ProjectileY      float64
+	Projectiles      []Projectile
 
 	lastTime time.Time
+	lastShot time.Time
 }
 
-func NewPlayer(x, y float64, sprite *ebiten.Image) *Player {
+func NewPlayer(x, y float64, assetFs *embed.FS) *Player {
 	return &Player{
-		Position:     pkg.Vec2{x, y},
-		Velocity:     pkg.Vec2{},
-		MaxSpeed:     600,
-		Acceleration: 100,
-		Deceleration: 10,
-		Sprite:       sprite,
-		lastTime:     time.Now(),
+		Position:         pkg.Vec2{x, y},
+		Velocity:         pkg.Vec2{},
+		MaxSpeed:         600,
+		Acceleration:     100,
+		Deceleration:     10,
+		Sprite:           pkg.LoadImage("assets/player.png", assetFs),
+		ProjectileSprite: pkg.LoadImage("assets/projectile.png", assetFs),
+		Projectiles:      make([]Projectile, 0, 50),
+		lastTime:         time.Now(),
 	}
 }
 
 func (p *Player) Update() {
 	currentTime := time.Now()
+
 	dt := currentTime.Sub(p.lastTime).Seconds()
 	p.lastTime = currentTime
 
@@ -39,6 +49,51 @@ func (p *Player) Update() {
 		dt = 0.1
 	}
 
+	updateMovement(p, dt)
+
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		p.shoot()
+	}
+
+	for i := range p.Projectiles {
+		if !p.Projectiles[i].Active {
+			continue
+		}
+		p.Projectiles[i].Position = p.Projectiles[i].Position.Add(p.Projectiles[i].Velocity.Mul(1 * dt))
+	}
+}
+
+func (p *Player) shoot() {
+	const shotCooldown = 150 * time.Millisecond
+
+	if time.Since(p.lastShot) < shotCooldown {
+		return
+	}
+
+	cursorX, cursorY := ebiten.CursorPosition()
+
+	dir := pkg.Vec2{float64(cursorX), float64(cursorY)}.Sub(pkg.Vec2{p.Position.X, p.Position.Y})
+
+	if dir.Len() == 0 {
+		return
+	}
+
+	dir = dir.Normalized()
+
+	bulletSpeed := 800.0
+
+	p.Projectiles = append(p.Projectiles, Projectile{
+		Position: pkg.Vec2{
+			X: p.Position.X + 40,
+			Y: p.Position.Y + 40,
+		},
+		Velocity: dir.Mul(bulletSpeed),
+		Active:   true,
+	})
+	p.lastShot = time.Now()
+}
+
+func updateMovement(p *Player, dt float64) {
 	input := pkg.Vec2{0, 0}
 
 	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsKeyPressed(ebiten.KeyArrowUp) {

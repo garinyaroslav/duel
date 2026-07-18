@@ -17,7 +17,7 @@ const (
 )
 
 //go:embed assets/*
-var AssetsFs embed.FS
+var assetsFs embed.FS
 
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
@@ -27,7 +27,7 @@ func main() {
 	ebiten.SetVsyncEnabled(true)
 	ebiten.SetTPS(targetTPS)
 
-	if err := ebiten.RunGame(internal.NewGame(AssetsFs)); err != nil {
+	if err := ebiten.RunGame(internal.NewGame(&assetsFs)); err != nil {
 		log.Fatal(err)
 	}
 }
