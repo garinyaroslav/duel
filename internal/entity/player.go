@@ -9,6 +9,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+type CharacterType int
+
+const (
+	SelfPlayer CharacterType = iota
+	Enemy
+)
+
 type Player struct {
 	Position         pkg.Vec2
 	Velocity         pkg.Vec2
@@ -19,14 +26,16 @@ type Player struct {
 	ProjectileSprite *ebiten.Image
 	ProjectileX      float64
 	ProjectileY      float64
-	Projectiles      []Projectile
+	Projectiles      []*Projectile
+	characterType    CharacterType
 
 	lastTime time.Time
 	lastShot time.Time
 }
 
-func NewPlayer(x, y float64, assetFs *embed.FS) *Player {
+func NewPlayer(x, y float64, characterType CharacterType, assetFs *embed.FS) *Player {
 	return &Player{
+		characterType:    characterType,
 		Position:         pkg.Vec2{x, y},
 		Velocity:         pkg.Vec2{},
 		MaxSpeed:         600,
@@ -34,7 +43,7 @@ func NewPlayer(x, y float64, assetFs *embed.FS) *Player {
 		Deceleration:     10,
 		Sprite:           pkg.LoadImage("assets/player.png", assetFs),
 		ProjectileSprite: pkg.LoadImage("assets/projectile.png", assetFs),
-		Projectiles:      make([]Projectile, 0, 50),
+		Projectiles:      make([]*Projectile, 0, 50),
 		lastTime:         time.Now(),
 	}
 }
@@ -82,10 +91,10 @@ func (p *Player) shoot() {
 
 	bulletSpeed := 800.0
 
-	p.Projectiles = append(p.Projectiles, Projectile{
+	p.Projectiles = append(p.Projectiles, &Projectile{
 		Position: pkg.Vec2{
-			X: p.Position.X + 40,
-			Y: p.Position.Y + 40,
+			X: p.Position.X,
+			Y: p.Position.Y,
 		},
 		Velocity: dir.Mul(bulletSpeed),
 		Active:   true,
