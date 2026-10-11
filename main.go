@@ -2,11 +2,11 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	_ "image/png"
-	"log"
 
-	"github.com/garinyaroslav/duel/internal"
-	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/cqroot/prompt"
+	"github.com/cqroot/prompt/choose"
 )
 
 const (
@@ -20,14 +20,19 @@ const (
 var assetsFs embed.FS
 
 func main() {
-	ebiten.SetWindowSize(screenWidth, screenHeight)
-	ebiten.SetWindowTitle(windowTitle)
-	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
-	ebiten.SetFullscreen(true)
-	ebiten.SetVsyncEnabled(true)
-	ebiten.SetTPS(targetTPS)
+	typeOfPlayer, _ := prompt.New().Ask("Welcome to Duel! Would you like to be server or client?").
+		Choose([]string{"server", "client", "quit"}, choose.WithHelp(true))
 
-	if err := ebiten.RunGame(internal.NewGame(&assetsFs)); err != nil {
-		log.Fatal(err)
-	}
+	fmt.Print(typeOfPlayer)
+
+	// ebiten.SetWindowSize(screenWidth, screenHeight)
+	// ebiten.SetWindowTitle(windowTitle)
+	// ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	// ebiten.SetFullscreen(true)
+	// ebiten.SetVsyncEnabled(true)
+	// ebiten.SetTPS(targetTPS)
+	//
+	// if err := ebiten.RunGame(internal.NewGame(&assetsFs)); err != nil {
+	// 	log.Fatal(err)
+	// }
 }

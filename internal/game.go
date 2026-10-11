@@ -16,15 +16,24 @@ const (
 	NumberOfPlayers  = 2
 )
 
+type GameState int
+
+const (
+	Connection GameState = iota
+	Playing
+)
+
 type Game struct {
 	background *color.RGBA
 	players    [NumberOfPlayers]*entity.Player
+	state      GameState
 }
 
 func NewGame(assetFs *embed.FS) *Game {
 	return &Game{
 		background: &color.RGBA{0, 181, 226, 255},
 		players:    [NumberOfPlayers]*entity.Player{entity.NewPlayer(100, 100, 0, assetFs), entity.NewPlayer(1820, 100, 1, assetFs)},
+		state:      Connection,
 	}
 }
 
@@ -37,7 +46,12 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(g.background)
 
-	drawPlayers(g, screen)
+	switch g.state {
+	case Connection:
+		ebitenutil.DebugPrint(screen, "Waiting for connection...")
+	case Playing:
+		drawPlayers(g, screen)
+	}
 
 	drawDebugInfo(screen)
 }
