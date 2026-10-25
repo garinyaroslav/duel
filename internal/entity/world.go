@@ -126,7 +126,7 @@ func (w *World) moveBullets(dt float64) {
 
 		inside := b.Position.X >= 0 && b.Position.X <= WorldW &&
 			b.Position.Y >= 0 && b.Position.Y <= WorldH
-		if b.Life > 0 && inside {
+		if b.Life > 0 && inside && !hitsAnyWall(b.Position, BulletRadius) {
 			alive = append(alive, b)
 		}
 	}

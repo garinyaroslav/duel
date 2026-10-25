@@ -25,6 +25,7 @@ type Game struct {
 	step       func(pkg.Input, float64)
 	localID    entity.PlayerID
 	big        *ebiten.Image
+	mapImg     *ebiten.Image
 
 	playerSprite     *ebiten.Image
 	projectileSprite *ebiten.Image
@@ -37,6 +38,7 @@ func NewGame(assetFs *embed.FS, mode, addr string) (*Game, error) {
 		playerSprite:     pkg.LoadImage("assets/player.png", assetFs),
 		projectileSprite: pkg.LoadImage("assets/projectile.png", assetFs),
 		big:              ebiten.NewImage(256, 16),
+		mapImg:           renderMap(),
 	}
 
 	switch mode {
@@ -70,7 +72,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(g.background)
+	screen.DrawImage(g.mapImg, nil)
 
 	g.drawBullets(screen)
 	g.drawPlayers(screen)

@@ -83,4 +83,6 @@ func (p *Player) move(in pkg.Input, dt float64) {
 
 	p.Position.X = max(PlayerRadius, min(p.Position.X, WorldW-PlayerRadius))
 	p.Position.Y = max(PlayerRadius, min(p.Position.Y, WorldH-PlayerRadius))
+
+	p.collideWalls()
 }
