@@ -14,7 +14,7 @@ A networked top-down duel game for two players. Written in Go using [Ebitengine]
 | ------ | ------------------------------------------ |
 | Move   | `W` `A` `S` `D` or arrow keys              |
 | Aim    | mouse                                      |
-| Shoot  | `Space` or left mouse button (can be held) |
+| Shoot  | `Space` or left mouse button               |
 
 ## Running
 
